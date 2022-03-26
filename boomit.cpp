@@ -4,37 +4,61 @@
 #define ffor(i, a, n) for (long long i = a; i <= n; i++)
 using namespace std;
 int cnt,putmouse;//Ê±¼äÏà¹ØÁ¿£¬±ØÐëÈ«¾Ö¶¨Òå
+int boomid;//ÊµÊ±±¬Õ¨µÄÕ¨µ¯id
 class boomap
 {
 	public:
 		int mp[500][500]=
 			{//³õÊ¼»¯Ò»¸ö¾«ÃÀµÄµØÍ¼
-			{1,2,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2,2,2,2,2,1,},
-			{1,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,},
-			{1,0,2,0,2,1,2,2,2,2,2,2,1,2,2,2,2,2,0,0,0,0,1,},
-			{1,0,0,0,2,1,1,1,2,2,2,2,1,2,2,2,2,2,0,0,0,0,1,},
-			{1,2,0,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,0,0,0,2,1,},
-			{1,2,0,2,2,2,1,1,1,1,1,2,2,2,1,1,1,1,1,2,2,2,1,},
-			{1,2,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,2,1,1,1,1,1,0,0,0,0,0,2,1,1,1,1,2,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,1,1,1,2,1,},
-			{1,2,1,1,2,2,1,2,2,1,1,2,1,1,2,2,2,2,2,2,2,2,1,},
-			{1,2,1,1,2,1,1,2,2,1,1,1,1,1,2,2,2,2,2,2,1,1,1,},
-			{1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,2,1,1,2,2,2,1,},
-			{1,2,2,1,1,1,1,1,2,2,0,0,0,2,2,2,2,2,2,1,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,1,},
-			{1,2,2,0,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,0,1,1,1,1,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1,},
-			{1,2,0,0,2,2,2,2,2,2,1,2,2,2,2,2,2,2,0,0,2,2,1,},
-			{1,2,0,0,0,2,1,1,2,2,1,2,2,2,1,1,1,1,1,0,0,2,2,},
-			{1,2,0,0,0,2,2,2,2,2,1,2,2,2,2,2,2,2,0,0,0,2,1,},
-			{1,2,2,2,2,2,2,2,2,2,1,2,1,1,2,2,2,2,0,0,0,2,1,},
-			{1,2,2,1,1,1,1,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1,},
-			{1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,},};
+			{1,2,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2,2,2,2,2,1,2,},
+			{1,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,},
+			{1,0,2,0,2,1,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,2,},
+			{1,0,0,0,2,1,2,1,2,2,1,2,2,2,2,2,2,2,2,0,0,0,1,2,},
+			{1,0,0,0,0,2,2,2,2,2,2,2,1,2,2,2,2,2,2,0,0,2,1,2,},
+			{1,2,0,2,0,2,1,2,1,1,1,2,2,2,1,2,1,2,2,2,2,2,2,2,},
+			{1,2,0,2,2,2,2,2,2,2,1,2,1,2,2,2,2,2,0,2,0,2,2,2,},
+			{1,2,2,2,1,2,1,1,1,0,0,2,2,0,2,1,1,2,1,0,2,2,2,2,},
+			{1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,},
+			{1,2,2,2,2,2,2,2,2,1,1,2,1,1,2,2,2,2,1,1,2,2,2,1,},
+			{1,2,2,1,2,2,1,2,1,1,4,2,5,5,1,2,2,2,2,2,2,2,2,2,},
+			{1,2,2,2,2,1,1,2,1,5,5,2,4,1,1,2,2,2,2,2,2,1,2,2,},
+			{1,2,2,2,2,2,2,2,2,1,1,2,1,1,2,2,2,2,2,2,2,2,2,2,2,},
+			{1,2,2,0,2,2,2,2,2,0,2,2,2,0,2,2,2,1,1,2,2,2,1,2,},
+			{1,0,0,1,2,1,2,1,2,2,1,2,1,2,2,2,2,2,2,1,2,2,2,2,},
+			{1,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,2,2,2,2,2,1,},
+			{1,2,2,0,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,1,},
+			{1,2,2,0,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,},
+			{1,2,2,0,2,2,2,2,2,2,1,2,2,2,2,2,2,2,0,2,2,2,1,2,},
+			{1,2,0,0,2,2,2,1,2,2,2,2,1,2,1,1,1,1,2,0,0,2,2,2,},
+			{1,2,2,0,2,2,2,2,2,2,1,2,2,2,2,2,2,2,0,2,0,2,1,1,},
+			{1,2,2,2,2,2,2,2,2,2,1,2,1,1,2,2,2,2,2,0,0,2,1,2,},
+			{1,2,2,1,2,1,1,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,},
+			{1,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,},
+			{1,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1,2,},
+			{1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,},};
+			/*{{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,2,2,2,2,2,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,2,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,2,2,2,2,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,2,2,2,2,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},
+			{1,0,0,0,0,2,0,2,0,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,},};*/
 			/*{
 			{0,0,2,1,1,1,2,2,0,1,1,1,0,2,2,1,},
 			{2,2,2,2,2,2,0,0,2,2,2,2,2,2,0,0,},
@@ -62,8 +86,15 @@ class boomap
 			mp[i][hl]=mp[hl][i+1]=1;
 			return;
 		}
-		bool move_able(int x,int y)
-		{return mp[y][x]!=1&&mp[y][x]!=2;}
+		bool move_able(int x,int y,int type=0)
+		{
+			if(type==0)return mp[y][x]!=1&&mp[y][x]!=2;
+			else if (type == 1)y--;
+			else if (type == 2)x++;
+			else if (type == 3)x--;
+			else if (type == 4)y++;
+			return mp[y][x]!=1&&mp[y][x]!=2;
+		}
 		int boooomit(int y,int x,int power)//booooom£¡£¡
 		{
 			int score=0;
@@ -83,8 +114,8 @@ class boomap
 				if(mp[i][y]==2)score++;//´òÆÆÏä×Ó¼Ó·Ö¡£
 				if(mp[i][y]==0)mp[i][y]=198;
 				else if(mp[i][y]==1)break;
-				else if(mp[i][y]==2&&(rand()%3==1))mp[i][y]=202;//²úÉúµÀ¾ß
-				else if(mp[i][y]==2&&(rand()%6==2))mp[i][y]=203;//²úÉúµÀ¾ß
+				else if(mp[i][y]==2&&(rand()%4==1))mp[i][y]=202;//²úÉúµÀ¾ß
+				else if(mp[i][y]==2&&(rand()%9==1))mp[i][y]=203;//²úÉúµÀ¾ß
 				else if(mp[i][y]==2)mp[i][y]=198;
 			}
 			for(int i=x;i>=up;i--)
@@ -92,8 +123,8 @@ class boomap
 				if(mp[i][y]==2)score++;
 				if(mp[i][y]==0)mp[i][y]=198;
 				else if(mp[i][y]==1)break;
-				else if(mp[i][y]==2&&(rand()%3==1))mp[i][y]=202;
-				else if(mp[i][y]==2&&(rand()%5==2))mp[i][y]=203;
+				else if(mp[i][y]==2&&(rand()%4==2))mp[i][y]=202;
+				else if(mp[i][y]==2&&(rand()%9==2))mp[i][y]=203;
 				else if(mp[i][y]==2)mp[i][y]=198;
 			}
 			ffor(i,y,rt)
@@ -101,8 +132,8 @@ class boomap
 				if(mp[x][i]==2)score++;
 				if(mp[x][i]==0)mp[x][i]=198;
 				else if(mp[x][i]==1)break;
-				else if(mp[x][i]==2&&(rand()%3==1))mp[x][i]=202;
-				else if(mp[x][i]==2&&(rand()%6==2))mp[x][i]=203;
+				else if(mp[x][i]==2&&(rand()%4==3))mp[x][i]=202;
+				else if(mp[x][i]==2&&(rand()%9==3))mp[x][i]=203;
 				else if(mp[x][i]==2)mp[x][i]=198;
 			}
 			for(int i=y;i>=lf;i--)
@@ -110,14 +141,23 @@ class boomap
 				if(mp[x][i]==2)score++;
 				if(mp[x][i]==0)mp[x][i]=198;
 				else if(mp[x][i]==1)break;
-				else if(mp[x][i]==2&&(rand()%3==1))mp[x][i]=202;
-				else if(mp[x][i]==2&&(rand()%5==2))mp[x][i]=203;
+				else if(mp[x][i]==2&&(rand()%4==0))mp[x][i]=202;
+				else if(mp[x][i]==2&&(rand()%9==4))mp[x][i]=203;
 				else if(mp[x][i]==2)mp[x][i]=198;
 			}
 			return score;
 		}
 		int put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd);
 }mymap;
+int breath(int x,int y)
+{
+	int ans=0;
+	if(mymap.mp[y+1][x]==0||mymap.mp[y+1][x]>3)ans++;
+	if(mymap.mp[y-1][x]==0||mymap.mp[y-1][x]>3)ans++;
+	if(mymap.mp[y][x+1]==0||mymap.mp[y][x+1]>3)ans++;
+	if(mymap.mp[y][x-1]==0||mymap.mp[y][x-1]>3)ans++;
+	return ans;
+}
 class boom
 {
 	public:
@@ -130,22 +170,27 @@ class boom
 			mymap.mp[b][a]=3;
 			return;
 		}
-		bool danger(int x,int y)
+		int safeway_judge(int tx,int ty,int type)
 		{
-			if(mymap.mp[x][y]>5)return true;
-			if(boomclock==0)return false;
-			if(x==px){
-				if(y>=py){if(power+py>=y)return true;}
-				else if(y<py){if(py-power<=y)return true;}
-			}else if(y==py){
-				if(x>=px){if(power+px>=x)return true;}
-				else if(x<px){if(px-power<=x)return true;}
-			}return false;
+				int x=tx,y=ty;
+			 	 if (type == 1)y--;
+			else if (type == 2)x++;
+			else if (type == 3)x--;
+			else if (type == 4)y++;
+			
+			if(mymap.mp[y][x]==1||mymap.mp[y][x]==2){x=tx;y=ty;}
+			if(mymap.mp[y][x]>5)return -100;
+			int disx=px-x,disy=py-y;
+			if(disx<0)disx=-disx;
+			if(disy<0)disy=-disy;
+			if(disy==0&&power>=disx)return 10*disx+breath(x,y);
+			if(disx==0&&power>=disy)return 10*disy+breath(x,y);
+			return 100;
 		}
 		int boomit()
 		{
-			if(boomclock>0&&boomclock<200-rand()%50)boomclock++;//Õ¨µ¯µ¹¼ÆÊ±,À´µã²»È·¶¨ÐÔ
-			else if(boomclock>0){boomclock=0;return mymap.boooomit(px,py,power);}//·µ»Ø±¬Õ¨ËùµÃµÄ·ÖÊý¡£
+			if(boomclock>0&&boomclock<170-rand()%50)boomclock++;//Õ¨µ¯µ¹¼ÆÊ±,À´µã²»È·¶¨ÐÔ
+			else if(boomclock>0){boomclock=0;int x=px,y=py;px=mymap.hl+1;py=mymap.hl+1;return mymap.boooomit(x,y,power);}//·µ»Ø±¬Õ¨ËùµÃµÄ·ÖÊý¡£
 			return -1;
 		}
 }boom1,boom2,botboom1,botboom2;
@@ -186,72 +231,85 @@ class player
 			return newboom;
 		}
 }player1,player2;
-
 class bot :public player
 {
 	public: 
 		bool boomout=false;
 		int boomputime;
 		bool alive=true;
-		int health=150;
+		int health=5;
 		bool think()
 		{
+			int try1,try2;
 			int dis1=abs(px-player1.px)+abs(py-player1.py);
 			int dis2=abs(px-player2.px)+abs(py-player2.py);
 			//¼òµ¥´Ö±©µÄËã·¨£¬Ë­½ü¾Í×¥Ë­£¬Í¬Ê±¹¥»÷ÐÔÊ®×ã¡£
-			if(dis1<dis2)
+			if(dis1<=dis2)
 			{
-				if(px<player1.px)type=2;
-				else if(px>player1.px)type=3;
-				else if(py<player1.py)type=4;
-				else type=1;
+				if(px<player1.px)try1=2;
+				else if(px>player1.px)try1=3;
+				else try1=rand()%2+2;
+				if(py<player1.py)try2=4;
+				else if(py>player1.px)try2=1;
+				else try2=4;
 			}else{
-				if(px<player2.px)type=2;
-				else if(px>player2.px)type=3;
-				else if(py<player2.py)type=4;
-				else type=1;
+				if(px<player2.px)try1=2;
+				else if(px>player2.px)try1=3;
+				else try1=rand()%2+2;
+				if(py<player2.py)try2=4;
+				else if(py>player2.px)try2=1;
+				else try2=1;
 			}
-			//¶ã±ÜÕ¨µ¯.
-			if(dis1>3&&dis2>3)
-			ffor(i,1,5)
-				{	
-					 if (type == 1&&botboom1.danger(px,py-1)){type=2;}
-					 if (type == 2&&botboom1.danger(px+1,py)){type=3;}
-					 if (type == 3&&botboom1.danger(px-1,py)){type=4;}
-					 if (type == 4&&botboom1.danger(px,py+1)){type=1;}
-					 if (type == 1&&botboom2.danger(px,py-1)){type=2;}
-					 if (type == 2&&botboom2.danger(px+1,py)){type=3;}
-					 if (type == 3&&botboom2.danger(px-1,py)){type=4;}
-					 if (type == 4&&botboom2.danger(px,py+1)){type=1;}
-					 if (type == 1&&boom1.danger(px,py-1)){type=2;}
-				 	 if (type == 2&&boom1.danger(px+1,py)){type=3;}
-					 if (type == 3&&boom1.danger(px-1,py)){type=4;}
-					 if (type == 4&&boom1.danger(px,py+1)){type=1;}
-					 if (type == 1&&boom2.danger(px,py-1)){type=2;}
-					 if (type == 2&&boom2.danger(px+1,py)){type=3;}
-					 if (type == 3&&boom2.danger(px-1,py)){type=4;}
-					 if (type == 4&&boom2.danger(px,py+1)){type=1;}
-				}
-				
-			//·ÀÖ¹¿¨Ç½²»¶¯¡£Êµ¼ÊÉÏ£¬³öºõÒâÁÏµÄÓÐÓÃ¡£
-				 if (type == 1&&!mymap.move_able(px,py-1)){type=4;}
-			else if (type == 2&&!mymap.move_able(px+1,py)){type=3;}
-			else if (type == 3&&!mymap.move_able(px-1,py)){type=2;}
-			else if (type == 4&&!mymap.move_able(px,py+1)){type=1;}
-				 if (type == 1&&!mymap.move_able(px,py-1)){type=2;}
-			else if (type == 2&&!mymap.move_able(px+1,py)){type=4;}
-			else if (type == 3&&!mymap.move_able(px-1,py)){type=1;}
-			else if (type == 4&&!mymap.move_able(px,py+1)){type=3;}
-			if(dis1==0||dis2==0)type=0;
-
+			if(!mymap.move_able(px,py,try1))
+				if(!mymap.move_able(px,py,try2))
+					if(!mymap.move_able(px,py,5-try1))
+						if(!mymap.move_able(px,py,5-try2))type=0;
+						else type=5-try2;
+					else type=5-try1;
+				else type=try2;
+			else type=try1;
+			//¶ã±ÜÕ¨µ¯£¡
+			int mmax=botboom1.safeway_judge(px,py,type);
+			if(mmax<100)
+			ffor(i,0,4)
+			if(botboom1.safeway_judge(px,py,i)>mmax)
+			{
+				type=i;mmax=botboom1.safeway_judge(px,py,i);
+			}
+			mmax=botboom2.safeway_judge(px,py,type);
+			if(mmax<100)
+			ffor(i,0,4)
+			if(botboom2.safeway_judge(px,py,i)>mmax)
+			{
+				type=i;mmax=botboom2.safeway_judge(px,py,i);
+			}
+			mmax=boom1.safeway_judge(px,py,type);
+			if(mmax<100)
+			ffor(i,0,4)
+			if(boom1.safeway_judge(px,py,i)>mmax)
+			{
+				type=i;mmax=boom1.safeway_judge(px,py,i);
+			}
+			mmax=boom2.safeway_judge(px,py,type);
+			if(mmax<100)
+			ffor(i,0,4)
+			if(boom2.safeway_judge(px,py,i)>mmax)
+			{
+				type=i;mmax=boom2.safeway_judge(px,py,i);
+			}
+			if(breath(px,py)==0)ffor(i,1,4)if(mymap.move_able(px,py,i))type=i;
+			if(dis1*dis2==0)type=0;
 			if((dis1<3||dis2<3)&&!boomout){boomout=true;return true;}
-			if(boomputime>300&&!boomout){boomout=true;boomputime=0;return true;}
+			if(boomputime>100&&!boomout&&(mymap.mp[px+1][py]==2||mymap.mp[px-1][py]==2||mymap.mp[px][py+1]==2||mymap.mp[px][py-1]==2||boomputime>300))
+			{boomout=true;boomputime=0;return true;}
 			else boomputime++;
 			return false;
 		}
 		void botdie()
 		{
 			health--;
+			if(boomid==1)player1.score+=50;
+			else if(boomid==2)player2.score+=50;
 			mymap.mp[px][py]=0;
 			if(health<0)
 			{
@@ -261,8 +319,8 @@ class bot :public player
 			}
 		}
 }bot1,bot2;
-
-int boomap::put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd)//¹Ø¼ü²½Öè£º´òÓ¡ÆÁÄ»
+int boomap::put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd)
+//¹Ø¼ü²½Öè£º´òÓ¡ÆÁÄ»
 {
 	ffor(i,1,hl)
 	{
@@ -271,30 +329,30 @@ int boomap::put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd)//¹Ø¼
 			if(a==j&&b==i)
 			{
 				if(mp[i][j]==0||mp[i][j]==3){putchar('P');putchar('1');}
-			 	else if(mp[i][j]==4){player1.speed+=3;mp[i][j]=0;}//³ÔµÀ¾ß
-			 	else if(mp[i][j]==5){player1.power++;mp[i][j]=0;}
+			 	else if(mp[i][j]==4){putchar('P');putchar('1');player1.speed+=3;mp[i][j]=0;}//³ÔµÀ¾ß
+			 	else if(mp[i][j]==5){putchar('P');putchar('1');player1.power++;mp[i][j]=0;}
 			 	else return 1;//×ßÈë±¬Õ¨£¬ËÀÍö
 			}
 		else if(c==j&&d==i)
 			{
 				if(mp[i][j]==0||mp[i][j]==3){putchar('P');putchar('2');}
-			 	else if(mp[i][j]==4){player2.speed+=3;mp[i][j]=0;}
-			 	else if(mp[i][j]==5){player2.power++;mp[i][j]=0;}
+			 	else if(mp[i][j]==4){putchar('P');putchar('2');player2.speed+=3;mp[i][j]=0;}
+			 	else if(mp[i][j]==5){putchar('P');putchar('2');player2.power++;mp[i][j]=0;}
 			 	else return 2;
 			}
 		else if(ba==j&&bb==i)
 			{
 				if(mp[i][j]==0||mp[i][j]==3){putchar('B');putchar('1');}
-			 	else if(mp[i][j]==4){bot1.speed+=2;mp[i][j]=0;}
-			 	else if(mp[i][j]==5){bot1.power++;mp[i][j]=0;}
-				else bot1.botdie();
+			 	else if(mp[i][j]==4){putchar('B');putchar('1');bot1.speed+=2;mp[i][j]=0;}
+			 	else if(mp[i][j]==5){putchar('B');putchar('1');bot1.power++;mp[i][j]=0;}
+				else {mp[i][j]=0;putchar('B');putchar('1');bot1.botdie();}
 			}
 		else if(bc==j&&bd==i)
 			{
 				if(mp[i][j]==0||mp[i][j]==3){putchar('B');putchar('2');}
-			 	else if(mp[i][j]==4){bot2.speed+=2;mp[i][j]=0;}
-			 	else if(mp[i][j]==5){bot2.power++;mp[i][j]=0;}
-				else bot2.botdie();
+			 	else if(mp[i][j]==4){putchar('B');putchar('2');bot2.speed+=2;mp[i][j]=0;}
+			 	else if(mp[i][j]==5){putchar('B');putchar('2');bot2.power++;mp[i][j]=0;}
+				else {mp[i][j]=0;putchar('B');putchar('2');bot2.botdie();}
 			}
 		else if(mp[i][j]==0){putchar(' ');putchar(' ');}
 		else if(mp[i][j]==1){putchar('#');putchar('#');}
@@ -312,8 +370,9 @@ int boomap::put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd)//¹Ø¼
 	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
 	ffor(i,1,hl-10){putchar(' ');}printf("player1 : %d         \n",player1.score);
 	ffor(i,1,hl-10){putchar(' ');}printf("player2 : %d         \n",player2.score);
-	if(bot1.alive)ffor(i,1,hl-8){putchar(' ');}printf("bot1 : %d         \n",bot1.score);
-	if(bot2.alive)ffor(i,1,hl-8){putchar(' ');}printf("bot2 : %d         \n",bot2.score);
+	ffor(i,1,hl-10){putchar(' ');}printf("  time :%d         \n",(12525-cnt)/25);
+	ffor(i,1,hl-8){putchar(' ');}if(bot1.alive)printf("bot1 : %d         \n",bot1.score);else printf("bot1 : dead!               \n");
+	ffor(i,1,hl-8){putchar(' ');}if(bot2.alive)printf("bot2 : %d         \n",bot2.score);else printf("bot2 : dead!               \n");
 	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
 	return 0;
 }
@@ -328,6 +387,7 @@ void deal_with_input()
 		else if (ch == 'd'){if(player1.lastype==12)player1.type=6;else player1.type=2;}
 		else if (ch == 'a'){if(player1.lastype==13)player1.type=7;else player1.type=3;}
 		else if (ch == 's'){if(player1.lastype==14)player1.type=8;else player1.type=4;}
+		else if (ch == 'e'){if(boom1.boomclock>0)boom1.boomclock+=150;}
 		else if (ch == 'q')player1.type=0;
 		else if (ch == 'c')player1.px=3,player1.py=3;//Ò»¸öÐ¡Ð¡µÄºóÃÅ
 		else if(int(ch)==32&&boom1.boomclock==0)boom1=player1.putboom();
@@ -336,6 +396,7 @@ void deal_with_input()
 		else if (ch == 'l'){if(player2.lastype==12)player2.type=6;else player2.type=2;}
 		else if (ch == 'j'){if(player2.lastype==13)player2.type=7;else player2.type=3;}
 		else if (ch == 'k'){if(player2.lastype==14)player2.type=8;else player2.type=4;}
+		else if (ch == 'u'){if(boom2.boomclock>0)boom2.boomclock+=150;}
 		else if (ch == 'o')player2.type=0;
 		else if (ch == 'p')player2.px=mymap.hl-3,player2.py=mymap.hl-3;//Ò»¸öÐ¡Ð¡µÄºóÃÅ
 		else if(int(ch)==13&&boom2.boomclock==0)boom2=player2.putboom();
@@ -370,10 +431,18 @@ void end_game(int x)//ÓÎÏ·½áÊø
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(hOut, pos);// ÇåÆÁ
 	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
-	ffor(i,1,hl-8){putchar(' ');}printf("player %d is dead!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
+	if(x>0)
+	{ffor(i,1,hl-8){putchar(' ');}printf("player %d is dead!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
 	if(x==1)x=2;else x=1;
 	ffor(i,1,hl-8){putchar(' ');}printf("player %d wins!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');}
+	else {
+		x=2;
+		if(player1.score>player2.score)x=1;
+		ffor(i,1,hl-8){putchar(' ');}printf("player %d wins!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
+		ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+		ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	}
 	ffor(i,1,hl-5)
 	{ffor(j,1,hl){putchar(' ');putchar(' ');}
 	putchar('\n');}
@@ -388,21 +457,22 @@ void end_game(int x)//ÓÎÏ·½áÊø
 }
 bool play()
 {
-	if(putmouse>10){HideCursor();putmouse=0;}else putmouse++;//Çå³ý¹â±ê£¬µ«ÊÇ½ÚÊ¡Ê±¼ä²»ÓÃÒ»Ö±¿ªÆô
+	HideCursor();
 	COORD pos = {0, 0};
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(hOut, pos);// Ïàµ±ÓÚº¯Êýgotoxy (0,0);
 
+	if(cnt++>12525||player1.score>300||player1.score>300)end_game(0);
 	player1.move();
 	player2.move();
 	int score=boom1.boomit();
-	if(score>0)player1.score+=score;
+	if(score>0){player1.score+=score;boomid=1;}
 	score=boom2.boomit();
-	if(score>0)player2.score+=score;
+	if(score>0){player2.score+=score;boomid=2;}
 	score=botboom1.boomit();
-	if(score>=0){bot1.boomout=false;bot1.score+=score;}
+	if(score>=0){bot1.boomout=false;bot1.score+=score;boomid=0;}
 	score=botboom2.boomit();
-	if(score>=0){bot2.boomout=false;bot2.score+=score;}
+	if(score>=0){bot2.boomout=false;bot2.score+=score;boomid=0;}
 	if(bot1.alive)
 	{
 		if(bot1.think())botboom1=bot1.putboom();
@@ -420,16 +490,16 @@ bool play()
 void introduction()
 {
 	cout<<" boomit ÓÎÏ·½éÉÜ "<<endl;
-	cout<<" Íæ¼ÒP1 Ê¹ÓÃwasdÒÆ¶¯,q¼üÕ¾Á¢²»¶¯¡£ "<<endl;
-	cout<<" Íæ¼ÒP2 Ê¹ÓÃijklÒÆ¶¯,o¼üÕ¾Á¢²»¶¯¡£ "<<endl;
-	cout<<" Íæ¼Ò Ë«»÷·½Ïò¼ü×Ô¶¯ÐÐÊ» "<<endl;
+	cout<<" Íæ¼ÒP1 Ê¹ÓÃwasdÒÆ¶¯,q¼üÕ¾Á¢²»¶¯¡£\n ¿Õ¸ñÕ¨µ¯£¡\n e¼üÌáÇ°Òý±¬ "<<endl;
+	cout<<" Íæ¼ÒP2 Ê¹ÓÃijklÒÆ¶¯,o¼üÕ¾Á¢²»¶¯¡£\n »Ø³µÕ¨µ¯£¡\n u¼üÌáÇ°Òý±¬ "<<endl;
+	cout<<" ±¬Õ¨»áÆÆ»µ[]Ïä×Ó,»ñµÃ¼Ó·Ö£¡"<<endl;
+	cout<<" ±¬Õ¨»á±»Ó²Ç½##µ²×¡"<<endl;
+	cout<<" Íæ¼Ò¿ÉË«»÷·½Ïò¼ü×Ô¶¯ÐÐÊ» "<<endl;
 	cout<<" ´òÆÆÏä×Ó¼Ó·Ö²¢ÇÒ¸ÅÂÊµôÂäµÀ¾ß£º\n ¼ÓËÙ(GD)£¬»òÕßÕ¨µ¯Éý¼¶(BM) "<<endl;
-	cout<<" ³¡¾°ÖÐÓÐ2¸ö»úÆ÷ÈË,\n ËûÃÇÓÐ´óÁ¿µÄÉúÃüÖµÇÒ¾ßÓÐ¹¥»÷ÐÔ "<<endl;
+	cout<<" ³¡¾°ÖÐÓÐ2¸ö»úÆ÷ÈËB1B2,\n ËûÃÇÓÐ5ÌõÃüÇÒ¾ßÓÐ¹¥»÷ÐÔ \n Õ¨µ½ËûÃÇ»ñµÃ¾Þ¶î·ÖÊý£¡"<<endl;
+	cout<<" ÂÊÏÈµ½´ï300·Ö»ñÊ¤£¡\n 500sºóÓÎÏ·½áÊø,·Ö¸ßÕßÊ¤£¡"<<endl;
 	putchar(' ');
 	system("pause");
-	
-	ffor(i,1,100){
-	ffor(j,1,100)putchar(' ');putchar('\n');}
 }
 int main() {
 	introduction();
