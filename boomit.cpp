@@ -145,7 +145,7 @@ class boomap
 				else if(mp[x][i]==2&&(rand()%9==4))mp[x][i]=203;
 				else if(mp[x][i]==2)mp[x][i]=198;
 			}
-			return score;
+			return 2*score;
 		}
 		int put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd);
 }mymap;
@@ -189,7 +189,7 @@ class boom
 		}
 		int boomit()
 		{
-			if(boomclock>0&&boomclock<170-rand()%50)boomclock++;//炸弹倒计时,来点不确定性
+			if(boomclock>0&&boomclock<100-rand()%70)boomclock++;//炸弹倒计时,来点不确定性
 			else if(boomclock>0){boomclock=0;int x=px,y=py;px=mymap.hl+1;py=mymap.hl+1;return mymap.boooomit(x,y,power);}//返回爆炸所得的分数。
 			return -1;
 		}
@@ -202,7 +202,7 @@ class player
 		int type,lastype=0;
 		int power;
 		int score;
-		void set_player(int x,int y,int z=15,int pw=1)
+		void set_player(int x,int y,int z=20,int pw=1)
 		{
 			px=x;
 			py=y;
@@ -212,7 +212,7 @@ class player
 		}
 		void move(int x=0)//根据type值行动
 		{
-			if(moveturn<250/speed){moveturn++;return;}else moveturn=1;//设置移动间隔，控制速度。
+			if(moveturn<300/speed-5){moveturn++;return;}else moveturn=1;//设置移动间隔，控制速度。
 
 				 if (type == 1&&mymap.move_able(px,py-1)){py--;type=0;if(lastype=1)lastype=11;else lastype=1;}
 			else if (type == 2&&mymap.move_able(px+1,py)){px++;type=0;if(lastype=2)lastype=12;else lastype=2;}
@@ -221,7 +221,7 @@ class player
 			else if (type == 5&&mymap.move_able(px,py-1))py--;
 			else if (type == 6&&mymap.move_able(px+1,py))px++;
 			else if (type == 7&&mymap.move_able(px-1,py))px--;
-			else if (type == 8&&mymap.move_able(px,py+1))py++;//连击击自动
+			else if (type == 8&&mymap.move_able(px,py+1))py++;//连击自动
 			else return;
 		}
 		boom putboom()
@@ -237,7 +237,7 @@ class bot :public player
 		bool boomout=false;
 		int boomputime;
 		bool alive=true;
-		int health=5;
+		int health=3;
 		bool think()
 		{
 			int try1,try2;
@@ -260,7 +260,8 @@ class bot :public player
 				else if(py>player2.px)try2=1;
 				else try2=1;
 			}
-			if(!mymap.move_able(px,py,try1))
+			if(dis1>3&&dis2>3)
+			{if(!mymap.move_able(px,py,try1))
 				if(!mymap.move_able(px,py,try2))
 					if(!mymap.move_able(px,py,5-try1))
 						if(!mymap.move_able(px,py,5-try2))type=0;
@@ -297,10 +298,10 @@ class bot :public player
 			{
 				type=i;mmax=boom2.safeway_judge(px,py,i);
 			}
-			if(breath(px,py)==0)ffor(i,1,4)if(mymap.move_able(px,py,i))type=i;
+			if(breath(px,py)==0)ffor(i,1,4)if(mymap.move_able(px,py,i))type=i;}
 			if(dis1*dis2==0)type=0;
 			if((dis1<3||dis2<3)&&!boomout){boomout=true;return true;}
-			if(boomputime>100&&!boomout&&(mymap.mp[px+1][py]==2||mymap.mp[px-1][py]==2||mymap.mp[px][py+1]==2||mymap.mp[px][py-1]==2||boomputime>300))
+			if(boomputime>70&&!boomout&&(mymap.mp[px+1][py]==2||mymap.mp[px-1][py]==2||mymap.mp[px][py+1]==2||mymap.mp[px][py-1]==2||boomputime>220))
 			{boomout=true;boomputime=0;return true;}
 			else boomputime++;
 			return false;
@@ -308,8 +309,8 @@ class bot :public player
 		void botdie()
 		{
 			health--;
-			if(boomid==1)player1.score+=50;
-			else if(boomid==2)player2.score+=50;
+			if(boomid==1)player1.score+=80;
+			else if(boomid==2)player2.score+=80;
 			mymap.mp[px][py]=0;
 			if(health<0)
 			{
@@ -319,61 +320,91 @@ class bot :public player
 			}
 		}
 }bot1,bot2;
+void cputchar(char str, WORD color) {//colors!!!!!!!!
+	WORD colorOld;
+	HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(handle, &csbi);
+	colorOld = csbi.wAttributes;
+	SetConsoleTextAttribute(handle, color);
+	putchar(str);
+	SetConsoleTextAttribute(handle, colorOld);
+}
+void cputhings(int x,WORD color) {//colors!!!!!!!!
+	WORD colorOld;
+	HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(handle, &csbi);
+	colorOld = csbi.wAttributes;
+	SetConsoleTextAttribute(handle, color);
+	if(x==1)printf("龘");
+	else if(x==2) printf("〇");
+	else if(x==3) printf("黑");
+	else printf("白");
+	SetConsoleTextAttribute(handle, colorOld);
+}
 int boomap::put_screen(int a,int b,int c,int d,int ba,int bb,int bc,int bd)
 //关键步骤：打印屏幕
 {
+	putchar('\n');putchar('\n');putchar('\n');
 	ffor(i,1,hl)
 	{
+		printf("                         ");
 		ffor(j,1,hl)
 		{
 			if(a==j&&b==i)
 			{
-				if(mp[i][j]==0||mp[i][j]==3){putchar('P');putchar('1');}
-			 	else if(mp[i][j]==4){putchar('P');putchar('1');player1.speed+=3;mp[i][j]=0;}//吃道具
-			 	else if(mp[i][j]==5){putchar('P');putchar('1');player1.power++;mp[i][j]=0;}
-			 	else return 1;//走入爆炸，死亡
+				if(mp[i][j]==0)cputhings(3,15);
+				else if(mp[i][j]==3){cputchar('!',64);cputchar('!',64);}
+			 	else if(mp[i][j]==4){cputchar('P',110);cputchar('1',110);player1.speed+=3;mp[i][j]=0;}//吃道具
+			 	else if(mp[i][j]==5){cputchar('P',120);cputchar('1',120);player1.power++;mp[i][j]=0;}
+			 	else {cputchar('P',91);cputchar('1',91);return 1;}//走入爆炸，死亡
 			}
 		else if(c==j&&d==i)
 			{
-				if(mp[i][j]==0||mp[i][j]==3){putchar('P');putchar('2');}
-			 	else if(mp[i][j]==4){putchar('P');putchar('2');player2.speed+=3;mp[i][j]=0;}
-			 	else if(mp[i][j]==5){putchar('P');putchar('2');player2.power++;mp[i][j]=0;}
-			 	else return 2;
+				if(mp[i][j]==0)cputhings(4,112);
+				else if(mp[i][j]==3){cputchar('!',64);cputchar('!',64);}
+			 	else if(mp[i][j]==4){cputchar('P',110);cputchar('2',110);player2.speed+=3;mp[i][j]=0;}
+			 	else if(mp[i][j]==5){cputchar('P',120);cputchar('2',120);player2.power++;mp[i][j]=0;}
+			 	else {cputchar('P',128);cputchar('2',128);return 2;}
 			}
 		else if(ba==j&&bb==i)
 			{
-				if(mp[i][j]==0||mp[i][j]==3){putchar('B');putchar('1');}
-			 	else if(mp[i][j]==4){putchar('B');putchar('1');bot1.speed+=2;mp[i][j]=0;}
-			 	else if(mp[i][j]==5){putchar('B');putchar('1');bot1.power++;mp[i][j]=0;}
-				else {mp[i][j]=0;putchar('B');putchar('1');bot1.botdie();}
+				if(mp[i][j]==0){cputchar(' ',160);cputchar(' ',160);}
+				else if(mp[i][j]==3){cputchar('!',64);cputchar('!',64);}
+			 	else if(mp[i][j]==4){cputchar('B',110);cputchar('1',110);bot1.speed+=2;mp[i][j]=0;}
+			 	else if(mp[i][j]==5){cputchar('B',120);cputchar('1',120);bot1.power++;mp[i][j]=0;}
+				else {mp[i][j]=0;cputchar('B',64);cputchar('1',64);bot1.botdie();}
 			}
 		else if(bc==j&&bd==i)
 			{
-				if(mp[i][j]==0||mp[i][j]==3){putchar('B');putchar('2');}
-			 	else if(mp[i][j]==4){putchar('B');putchar('2');bot2.speed+=2;mp[i][j]=0;}
-			 	else if(mp[i][j]==5){putchar('B');putchar('2');bot2.power++;mp[i][j]=0;}
-				else {mp[i][j]=0;putchar('B');putchar('2');bot2.botdie();}
+				if(mp[i][j]==0){cputchar(' ',219);cputchar(' ',219);}
+				else if(mp[i][j]==3){cputchar('!',64);cputchar('!',64);}
+			 	else if(mp[i][j]==4){cputchar('B',110);cputchar('2',110);bot2.speed+=2;mp[i][j]=0;}
+			 	else if(mp[i][j]==5){cputchar('B',120);cputchar('2',120);bot2.power++;mp[i][j]=0;}
+				else {mp[i][j]=0;cputchar('B',64);cputchar('2',64);bot2.botdie();}
 			}
-		else if(mp[i][j]==0){putchar(' ');putchar(' ');}
-		else if(mp[i][j]==1){putchar('#');putchar('#');}
-		else if(mp[i][j]==2){putchar('[');putchar(']');}
-		else if(mp[i][j]==3){putchar('!');putchar('!');}
-		else if(mp[i][j]==4){putchar('G');putchar('D');}
-		else if(mp[i][j]==5){putchar('B');putchar('M');}
-		else {putchar(char(rand()%60+35));putchar(char(rand()%60+35));mp[i][j]-=6;}
+		else if(mp[i][j]==0){cputchar(' ',255);cputchar(' ',255);}
+		else if(mp[i][j]==1)cputhings(1,128);
+		else if(mp[i][j]==2)cputhings(2,248);
+		else if(mp[i][j]==3){cputchar('!',79);cputchar('!',79);}
+		else if(mp[i][j]==4){cputchar('S',63);cputchar('+',63);}
+		else if(mp[i][j]==5){cputchar('P',199);cputchar('+',199);}
+		else {cputchar(char(rand()%80+35),rand()%350);cputchar(char(rand()%80+35),rand()%350);mp[i][j]-=6;}
 		//乱码特效的光束！
 		//mp值每次-6，通过设置爆炸光束的不同对6余数，确定留下的物体。
 		}putchar('\n');
 	}
 	putchar('\n');
 	//计分板
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
-	ffor(i,1,hl-10){putchar(' ');}printf("player1 : %d         \n",player1.score);
-	ffor(i,1,hl-10){putchar(' ');}printf("player2 : %d         \n",player2.score);
-	ffor(i,1,hl-10){putchar(' ');}printf("  time :%d         \n",(12525-cnt)/25);
-	ffor(i,1,hl-8){putchar(' ');}if(bot1.alive)printf("bot1 : %d         \n",bot1.score);else printf("bot1 : dead!               \n");
-	ffor(i,1,hl-8){putchar(' ');}if(bot2.alive)printf("bot2 : %d         \n",bot2.score);else printf("bot2 : dead!               \n");
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+		
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	printf("                         ");ffor(i,1,hl-10){putchar(' ');}printf("player1 : %d         \n",player1.score);
+	printf("                         ");ffor(i,1,hl-10){putchar(' ');}printf("player2 : %d         \n",player2.score);
+	printf("                         ");ffor(i,1,hl-10){putchar(' ');}printf("  time :%d         \n",(3010-cnt)/10);
+	printf("                         ");ffor(i,1,hl-8){putchar(' ');}if(bot1.alive)printf("bot1 : %d         \n",bot1.score);else printf("bot1 : dead!               \n");
+	printf("                         ");ffor(i,1,hl-8){putchar(' ');}if(bot2.alive)printf("bot2 : %d         \n",bot2.score);else printf("bot2 : dead!               \n");
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
 	return 0;
 }
 void deal_with_input()
@@ -412,57 +443,79 @@ void HideCursor()
 }
 void init()
 {
+    HWND hwnd = GetForegroundWindow();
+    int cx = GetSystemMetrics(SM_CXSCREEN);            /* 屏幕宽度 像素 */
+    int cy = GetSystemMetrics(SM_CYSCREEN);            /* 屏幕高度 像素 */
+    LONG l_WinStyle = GetWindowLong(hwnd,GWL_STYLE);   /* 获取窗口信息 */
+    /* 设置窗口信息 最大化 取消标题栏及边框 */
+    SetWindowLong(hwnd,GWL_STYLE,(l_WinStyle | WS_POPUP | WS_MAXIMIZE) & ~WS_CAPTION & ~WS_THICKFRAME & ~WS_BORDER);
+    SetWindowPos(hwnd, HWND_TOP, 0, 0, cx, cy, 0);
 	system("color 0B");
 	mymap.set_boomap(24);
 	int hl=mymap.hl;
 	mymap.mp[hl-3][3]=mymap.mp[3][hl-3]=mymap.mp[hl-3][hl-3]=0;
 	player1.set_player(3,3);
 	player2.set_player(hl-3,hl-3);
-	bot1.set_player(3,hl-3,10,2);
-	bot2.set_player(hl-3,3,10,2);
+	bot1.set_player(3,hl-3,18,2);
+	bot2.set_player(hl-3,3,18,2);
 }
 void end_game(int x)//游戏结束
 {
-	system("color 90");
-	Sleep(2000);
+	system("color 02");
+	Sleep(200);
+	system("color 04");
+	Sleep(200);
+	system("color 03");
+	Sleep(200);
+	system("color 04");
+	Sleep(200);
+	system("color 02");
+	Sleep(200);
+	system("color 04");
+	Sleep(200);
+	system("color 03");
+	Sleep(200);
+	system("color 04");
+	Sleep(500);
 	system("color 0B");
 	int hl=mymap.hl;
 	COORD pos = {0, 0};
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(hOut, pos);// 清屏
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
 	if(x>0)
-	{ffor(i,1,hl-8){putchar(' ');}printf("player %d is dead!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
+	{printf("                         ");ffor(i,1,hl-8){putchar(' ');}printf("player %d is dead!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
 	if(x==1)x=2;else x=1;
-	ffor(i,1,hl-8){putchar(' ');}printf("player %d wins!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');}
+	printf("                         ");ffor(i,1,hl-8){putchar(' ');}printf("player %d wins!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');}
 	else {
 		x=2;
 		if(player1.score>player2.score)x=1;
-		ffor(i,1,hl-8){putchar(' ');}printf("player %d wins!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
-		ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
-		ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+		printf("                         ");ffor(i,1,hl-8){putchar(' ');}printf("player %d wins!",x);ffor(i,1,hl){putchar(' ');}putchar('\n');
+		printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+		printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
 	}
-	ffor(i,1,hl-5)
-	{ffor(j,1,hl){putchar(' ');putchar(' ');}
+	ffor(i,1,hl)
+	{printf("                         ");ffor(j,1,hl){putchar(' ');putchar(' ');}
 	putchar('\n');}
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
-	ffor(i,1,hl-10){putchar(' ');}printf("player1 : %d       ",player1.score);ffor(i,1,hl){putchar(' ');}putchar('\n');
-	ffor(i,1,hl-10){putchar(' ');}printf("player2 : %d       ",player2.score);ffor(i,1,hl){putchar(' ');}putchar('\n');
-	ffor(i,1,hl-8){putchar(' ');}printf("bot1 : %d         \n",bot1.score);
-	ffor(i,1,hl-8){putchar(' ');}printf("bot2 : %d         \n",bot2.score);
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
-	ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	printf("                         ");ffor(i,1,hl-10){putchar(' ');}printf("player1 : %d       ",player1.score);ffor(i,1,hl){putchar(' ');}putchar('\n');
+	printf("                         ");ffor(i,1,hl-10){putchar(' ');}printf("player2 : %d       ",player2.score);ffor(i,1,hl){putchar(' ');}putchar('\n');
+	printf("                         ");ffor(i,1,hl-8){putchar(' ');}printf("bot1 : %d                               \n",bot1.score);
+	printf("                         ");ffor(i,1,hl-8){putchar(' ');}printf("bot2 : %d                               \n",bot2.score);
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	printf("                         ");ffor(i,1,hl){putchar('=');putchar('=');}putchar('\n');
+	printf("                         ");
 	return;
 }
 bool play()
 {
-	HideCursor();
+	if(cnt%20==1)HideCursor();
 	COORD pos = {0, 0};
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(hOut, pos);// 相当于函数gotoxy (0,0);
 
-	if(cnt++>12525||player1.score>300||player1.score>300)end_game(0);
+	if(cnt++>3010||player1.score>300||player1.score>300)end_game(0);
 	player1.move();
 	player2.move();
 	int score=boom1.boomit();
@@ -489,23 +542,32 @@ bool play()
 }
 void introduction()
 {
-	cout<<" boomit 游戏介绍 "<<endl;
-	cout<<" 玩家P1 使用wasd移动,q键站立不动。\n 空格炸弹！\n e键提前引爆 "<<endl;
-	cout<<" 玩家P2 使用ijkl移动,o键站立不动。\n 回车炸弹！\n u键提前引爆 "<<endl;
-	cout<<" 爆炸会破坏[]箱子,获得加分！"<<endl;
-	cout<<" 爆炸会被硬墙##挡住"<<endl;
-	cout<<" 玩家可双击方向键自动行驶 "<<endl;
-	cout<<" 打破箱子加分并且概率掉落道具：\n 加速(GD)，或者炸弹升级(BM) "<<endl;
-	cout<<" 场景中有2个机器人B1B2,\n 他们有5条命且具有攻击性 \n 炸到他们获得巨额分数！"<<endl;
-	cout<<" 率先到达300分获胜！\n 500s后游戏结束,分高者胜！"<<endl;
-	putchar(' ');
-	system("pause");
+	putchar('\n');
+	putchar('\n');
+	putchar('\n');
+	printf("                         ");cout<<" boomit 游戏介绍 "<<endl;
+	printf("                         ");cout<<" 玩家P1 使用wasd移动,q键站立不动。\n";
+	printf("                         ");cout<<" 空格炸弹！ "<<endl;
+	printf("                         ");cout<<" 玩家P2 使用ijkl移动,o键站立不动。\n";
+	printf("                         ");cout<<" 回车炸弹！ "<<endl;
+	printf("                         ");cout<<" 爆炸会破坏[]箱子,获得加分！"<<endl;
+	printf("                         ");cout<<" 爆炸会被硬墙##挡住"<<endl;
+	printf("                         ");cout<<" 玩家可双击方向键自动行驶 "<<endl;
+	printf("                         ");cout<<" 打破箱子加分并且概率掉落道具：\n";
+	printf("                         ");cout<<" 加速(S+)，或者炸弹升级(P+) "<<endl;
+	printf("                         ");cout<<" 场景中有2个机器人B1B2,他们有5条命且具有攻击性:\n";
+	printf("                         ");cout<<" 炸到他们获得巨额分数！"<<endl;
+	printf("                         ");cout<<" 率先到达300分获胜！\n";
+	printf("                         ");cout<<" 300s后游戏结束,分高者胜！"<<endl;
+	ffor(j,1,26)putchar(' ');system("pause");
 }
 int main() {
 	introduction();
 	init();
+
 	do deal_with_input();
 	while(play());
+	
 	system("pause");
 	return 0;
 }
